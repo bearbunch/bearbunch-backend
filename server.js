@@ -19,7 +19,7 @@ app.post("/contact", async (req, res) => {
   try {
     // Create transporter
     const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
+      host: send.one.com,
       port: process.env.SMTP_PORT,
       secure: process.env.SMTP_PORT == 465, // SSL for 465, TLS for 587
       auth: {
