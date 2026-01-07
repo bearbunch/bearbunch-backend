@@ -1,7 +1,7 @@
 // server.js
 const express = require("express");
 const cors = require("cors");
-// const nodemailer = require("nodemailer"); // Uncomment when ready to use SMTP
+const nodemailer = require("nodemailer"); // Uncomment when ready to use SMTP
 require("dotenv").config();
 
 const app = express();
