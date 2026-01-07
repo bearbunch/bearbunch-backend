@@ -1,100 +1,61 @@
-require("dotenv").config();
+// server.js
 const express = require("express");
 const cors = require("cors");
-const nodemailer = require("nodemailer");
-const fetch = require("node-fetch");
+// const nodemailer = require("nodemailer"); // Uncomment when ready to use SMTP
+require("dotenv").config();
 
 const app = express();
-app.use(cors());
+app.use(cors({ origin: "*" }));
 app.use(express.json());
 
-// Nodemailer SMTP transporter
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT || 587,
-  secure: false,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS
-  }
-});
+const PORT = process.env.PORT || 10000;
 
-// Contact endpoint
+// ===== Route to receive contact form =====
 app.post("/contact", async (req, res) => {
-  const { name, email, title, message, time } = req.body;
+  console.log("=== Received contact form ===");
+  console.log(req.body); // Logs form data for testing
 
-  if (!email || !message || !title) return res.status(400).json({ error: "Missing fields" });
-
+  // ===== Nodemailer setup (commented out for testing) =====
+  /*
   try {
-    // 1️⃣ Email to admin
-    await transporter.sendMail({
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT,
+      secure: process.env.SMTP_PORT == 465, // true for 465, false for 587
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+
+    const mailOptionsAdmin = {
       from: `"Bearbunch" <${process.env.SMTP_USER}>`,
       to: process.env.ADMIN_EMAIL,
-      subject: `New Contact: ${title}`,
+      subject: `New Contact: ${req.body.title}`,
       html: `
-        <div style="font-family: system-ui, sans-serif; font-size: 12px">
-          <p><b>${name}</b> sent a message:</p>
-          <p>${message}</p>
-          <small>${time}</small>
+        <div>
+          <p><strong>Name:</strong> ${req.body.name}</p>
+          <p><strong>Email:</strong> ${req.body.email}</p>
+          <p><strong>Title:</strong> ${req.body.title}</p>
+          <p><strong>Message:</strong> ${req.body.message}</p>
+          <p><strong>Time:</strong> ${req.body.time}</p>
         </div>
-      `
-    });
+      `,
+    };
 
-    // 2️⃣ Email to user
-    await transporter.sendMail({
-      from: `"Bearbunch" <${process.env.SMTP_USER}>`,
-      to: email,
-      subject: "We received your message",
-      html: `
-        <div style="font-family: system-ui, sans-serif; font-size: 16px">
-          <a href="https://bearbunch.github.io/home/">
-            <img src="https://bearbunch.github.io/home/image.png" alt="logo" style="width:100%;height:auto"/>
-          </a>
-          <p>Hi ${name},</p>
-          <p>Thank you for reaching out! We have received your request: "<strong>${title}</strong>"</p>
-          <p>We'll respond within 3 business days.</p>
-          <p>Best regards,<br/>The Bearbunch Team</p>
-        </div>
-      `
-    });
+    await transporter.sendMail(mailOptionsAdmin);
 
-    res.json({ success: true });
+    res.json({ status: "success", message: "Email sent to admin" });
 
   } catch (err) {
     console.error("SMTP failed:", err);
-
-    // 3️⃣ Backup using EmailJS
-    try {
-      await fetch("https://api.emailjs.com/api/v1.0/email/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          service_id: process.env.EMAILJS_SERVICE_ID,
-          template_id: process.env.EMAILJS_TEMPLATE_ADMIN,
-          user_id: process.env.EMAILJS_USER_ID,
-          template_params: { name, email, title, message, time }
-        })
-      });
-
-      await fetch("https://api.emailjs.com/api/v1.0/email/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          service_id: process.env.EMAILJS_SERVICE_ID,
-          template_id: process.env.EMAILJS_TEMPLATE_USER,
-          user_id: process.env.EMAILJS_USER_ID,
-          template_params: { name, email, title, message, time }
-        })
-      });
-
-      res.json({ success: true, fallback: true });
-
-    } catch (backupErr) {
-      console.error("EmailJS fallback failed:", backupErr);
-      res.status(500).json({ error: "Both SMTP and EmailJS failed" });
-    }
+    res.status(500).json({ status: "error", message: err.message });
   }
+  */
+
+  // ===== Temporary response for testing without SMTP =====
+  res.json({ status: "success", message: "Form received and logged!" });
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Backend running on port ${PORT}`));
+// ===== Start server =====
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
