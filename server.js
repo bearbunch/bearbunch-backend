@@ -59,8 +59,12 @@ app.post("/contact", async (req, res) => {
     };
 
     // Send BOTH emails
-    await transporter.sendMail(mailOptionsAdmin);
-    await transporter.sendMail(mailOptionsUser);
+    const adminInfo = await transporter.sendMail(mailOptionsAdmin);
+    console.log("ADMIN MAIL INFO:", adminInfo);
+
+    const userInfo = await transporter.sendMail(mailOptionsUser);
+    console.log("USER MAIL INFO:", userInfo);
+
 
     console.log("Emails sent successfully!");
     return res.json({ status: "success", message: "Emails sent!" });
