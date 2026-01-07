@@ -16,7 +16,6 @@ app.post("/contact", async (req, res) => {
   console.log(req.body); // Logs form data for testing
 
   // ===== Nodemailer setup (commented out for testing) =====
-  /*
   try {
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
@@ -51,7 +50,6 @@ app.post("/contact", async (req, res) => {
     console.error("SMTP failed:", err);
     res.status(500).json({ status: "error", message: err.message });
   }
-  */
 
   // ===== Temporary response for testing without SMTP =====
   res.json({ status: "success", message: "Form received and logged!" });
